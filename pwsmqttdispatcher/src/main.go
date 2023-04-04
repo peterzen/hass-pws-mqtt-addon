@@ -155,9 +155,12 @@ func submitUpdateToWunderground(r *http.Request) {
 
 func main() {
 	// Get MQTT connection parameters from environment variables
-	mqttBroker := os.Getenv("MQTT_BROKER")
+	mqttBroker := os.Getenv("MQTT_HOST")
 	mqttPort := os.Getenv("MQTT_PORT")
-	mqttUser := os.Getenv("MQTT_USERNAME")
+	if mqttPort == "" {
+		mqttPort = "1883"
+	}
+	mqttUser := os.Getenv("MQTT_USER")
 	mqttPassword := os.Getenv("MQTT_PASSWORD")
 	mqttTopic := os.Getenv(("MQTT_TOPIC"))
 	if mqttTopic == "" {
@@ -165,12 +168,16 @@ func main() {
 	}
 
 	// Set up MQTT client options
-	opts := mqtt.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%s", mqttBroker, mqttPort))
+	mqttConnUri := fmt.Sprintf("tcp://%s:%s", mqttBroker, mqttPort)
+	opts := mqtt.NewClientOptions().AddBroker(mqttConnUri)
+	opts.SetClientID("pwsmqttdispatcher")
 	opts.SetUsername(mqttUser)
 	opts.SetPassword(mqttPassword)
 
 	// Create MQTT client
 	client := mqtt.NewClient(opts)
+
+	log.Printf("Connecting to MQTT broker %s\n", mqttConnUri)
 
 	// Connect to MQTT broker
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
@@ -210,8 +217,8 @@ func main() {
 	})
 
 	// Start HTTP server
-	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Starting server on :8765")
+	if err := http.ListenAndServe(":8765", nil); err != nil {
 		log.Fatal(err)
 	}
 }
