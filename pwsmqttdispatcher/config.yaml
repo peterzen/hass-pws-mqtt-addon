@@ -1,0 +1,18 @@
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+name: PWS to MQTT dispatcher addon
+version: "0.1.0"
+slug: pwsmqttdispatcher
+description: Push weather station (PWS) data to MQTT
+url: "https://github.com/peterzen/haas-pws-mqtt-addon/tree/main/pwsmqttdispatcher"
+arch:
+  - amd64
+init: false
+startup: application
+ports:
+  8080/tcp: 8765
+options:
+  mqtt_topic: "pwsmqttdispatcher"
+schema:
+  mqtt_topic: "str?"
+image: "docker.io/peterzen/pwsmqttdispatcher"
+host_network: true

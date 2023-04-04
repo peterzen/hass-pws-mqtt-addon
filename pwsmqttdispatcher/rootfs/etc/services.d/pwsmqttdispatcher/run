@@ -1,0 +1,18 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start the pwsmqttdispatcher service
+# s6-overlay docs: https://github.com/just-containers/s6-overlay
+# ==============================================================================
+
+# Declare variables
+declare mqtt_topic
+
+MQTT_HOST=$(bashio::services mqtt "host")
+MQTT_USER=$(bashio::services mqtt "username")
+MQTT_PASSWORD=$(bashio::services mqtt "password")
+MQTT_TOPIC="$(bashio::config 'mqtt_topic')"
+
+## Print the message the user supplied, defaults to "Hello World..."
+bashio::log.info "Starting pwsmqttdispatcher, MQTT topic: ${MQTT_TOPIC}"
+
+exec /usr/bin/pwsmqttdispatcher
