@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,15 +18,19 @@ import (
 
 type WeatherData struct {
 	ReceiverTime      string  `json:"receiverTime"`
+	ReceiverTimestamp int64   `json:"receiverTimestamp"`
 	TemperatureIndoor float64 `json:"temperatureIndoor"`
 	HumidityIndoor    float64 `json:"humidityIndoor"`
 	PressureAbsolute  float64 `json:"pressureAbsolute"`
 	PressureRelative  float64 `json:"pressureRelative"`
 	Temperature       float64 `json:"temperature"`
 	Humidity          float64 `json:"humidity"`
+	DewPoint          float64 `json:"dewPoint"`
 	WindDir           float64 `json:"windDir"`
+	WindDirCardinal   string  `json:"windDirCardinal"`
 	WindSpeed         float64 `json:"windSpeed"`
 	WindGust          float64 `json:"windGust"`
+	WindChill         float64 `json:"windChill"`
 	SolarRadiation    float64 `json:"solarRadiation"`
 	Uv                float64 `json:"uv"`
 	Uvi               float64 `json:"uvi"`
@@ -34,6 +39,7 @@ type WeatherData struct {
 	PrecipWeekly      float64 `json:"precipWeekly"`
 	PrecipMonthly     float64 `json:"precipMonthly"`
 	PrecipYearly      float64 `json:"precipYearly"`
+	HeatIndex         float64 `json:"heatIndex"`
 }
 
 var pwsIp string
@@ -77,7 +83,7 @@ func parseFloat(s string) float64 {
 	}
 	return f
 }
-func parseHtml(doc *goquery.Document) []byte {
+func parseHtml(doc *goquery.Document) WeatherData {
 
 	var weatherData WeatherData
 
@@ -132,13 +138,102 @@ func parseHtml(doc *goquery.Document) []byte {
 		})
 	})
 
+	return weatherData
+}
+
+func weatherDataAsJson(wd WeatherData) []byte {
 	// Convert the variables to JSON and print the result
-	jsonData, err := json.Marshal(weatherData)
+	jsonData, err := json.Marshal(wd)
 	if err != nil {
 		log.Printf("Unable to marshal JSON: %s\n", err)
 		return nil
 	}
 	return jsonData
+}
+
+func calculateHeatIndex(temperature, humidity float64) float64 {
+	// Convert temperature to Fahrenheit
+	temperature = (temperature * 1.8) + 32
+
+	// https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
+	if temperature >= 80 {
+		// Calculate the heat index in Fahrenheit
+		heatIndex := -42.379 + 2.04901523*temperature + 10.14333127*humidity - 0.22475541*temperature*humidity - 6.83783e-3*math.Pow(temperature, 2) - 5.481717e-2*math.Pow(humidity, 2) + 1.22874e-3*math.Pow(temperature, 2)*humidity + 8.5282e-4*temperature*math.Pow(humidity, 2) - 1.99e-6*math.Pow(temperature, 2)*math.Pow(humidity, 2)
+
+		// Convert heat index back to Celsius
+		heatIndex = (heatIndex - 32) * (5.0 / 9.0)
+		return heatIndex
+	}
+	return 0
+}
+
+func windDirToCardinal(windDirDeg int) string {
+	dir := []string{"N ⬇️", "NNE ⬇️", "NE ↙️", "ENE ⬅️", "E ⬅️", "ESE ⬅️", "SE ↖️", "SSE ⬆️", "S ⬆️", "SSW ⬆️", "SW ↗️", "WSW ➡️", "W ➡️", "WNW ➡️", "NW ↘️", "NNW ⬇️"}
+	wind := windDirDeg % 360
+	winddiroffset := (float64(wind) + (360.0 / 32.0)) / 360.0
+	winddiridx := int(math.Floor(winddiroffset / (1.0 / 16.0)))
+	winddir := dir[winddiridx]
+
+	return winddir + " (" + strconv.Itoa(wind) + "°)"
+}
+
+func dateToUnixTimestamp(dateStr string) (int64, error) {
+	layout := "15:04 1/2/2006" // day and month are swapped compared to the US format
+	location, err := time.LoadLocation("CET")
+	if err != nil {
+		return 0, err
+	}
+	t, err := time.ParseInLocation(layout, dateStr, location)
+	if err != nil {
+		if debugEnabled {
+			log.Printf("Cannot convert date from '%s': %s\n", dateStr, err)
+		}
+		return 0, err
+	}
+	return t.Unix(), nil
+}
+func calculateWindChill(windSpeed float64, temp float64) float64 {
+	// Calculate the wind chill temperature in Celsius using the National Weather Service's formula
+	// where T is the air temperature in Celsius and V is the wind speed in km/h
+
+	// A Wind Chill value cannot be calculated for wind speeds less than 4.8 kilometers/hour
+	if windSpeed < 4.8 {
+		return temp
+	}
+
+	V := windSpeed / 1.609344 // convert wind speed to miles per hour
+	T := temp*1.8 + 32        // convert temperature to Fahrenheit
+	WCI := 35.74 + 0.6215*T - 35.75*math.Pow(V, 0.16) + 0.4275*T*math.Pow(V, 0.16)
+	windChill := (WCI - 32) * 5 / 9 // convert wind chill to Celsius
+	return windChill
+}
+
+func calculateDewPoint(tempCelsius, humidity float64) float64 {
+	a := 17.27
+	b := 237.7
+	alpha := ((a * tempCelsius) / (b + tempCelsius)) + math.Log(humidity/100.0)
+	dewPointCelsius := (b * alpha) / (a - alpha)
+	return dewPointCelsius
+}
+
+func addCalculatedData(wd WeatherData) WeatherData {
+	heatIndex := calculateHeatIndex(wd.Temperature, wd.Humidity)
+	wd.HeatIndex = heatIndex
+
+	windDirCardinal := windDirToCardinal(int(wd.WindDir))
+	wd.WindDirCardinal = windDirCardinal
+
+	windChill := calculateWindChill(wd.WindSpeed, wd.Temperature)
+	wd.WindChill = windChill
+
+	dewPoint := calculateDewPoint(wd.Temperature, wd.Humidity)
+	wd.DewPoint = dewPoint
+
+	recTs, err := dateToUnixTimestamp(wd.ReceiverTime)
+	if err == nil {
+		wd.ReceiverTimestamp = recTs
+	}
+	return wd
 }
 
 func main() {
@@ -212,14 +307,16 @@ func main() {
 
 		if doc != nil {
 			weatherData := parseHtml(doc)
-			if weatherData != nil {
-				token := client.Publish(mqttTopic, 0, false, weatherData)
+			weatherData = addCalculatedData(weatherData)
+			weatherDataJson := weatherDataAsJson(weatherData)
+			if weatherDataJson != nil {
+				token := client.Publish(mqttTopic, 0, false, weatherDataJson)
 				if debugEnabled {
 					log.Printf("Published data to #%s\n", mqttTopic)
 				}
 				token.Wait()
 				if debugEnabled {
-					log.Println(string(weatherData))
+					log.Println(string(weatherDataJson))
 				}
 			}
 		}
