@@ -1,81 +1,127 @@
-
-- name: dewpt
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json.dewptf }}"
-  unit_of_measurement: ""
-- name: humidity
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json.humidity }}"
-  unit_of_measurement: "%"
-- name: precipRate
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: precipTotal
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: pressure
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: solarRadiation
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: stationID
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: temp
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: uv
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: windChill
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: winddir
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: windDirectionName
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: windGust
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-- name: windSpeed
-  state_topic: "weatherstation/data"
-  value_template: "{{ value_json. }}"
-  unit_of_measurement: ""
-
-
-indoorhumidity
-baromin
-rtfreq
-dewptf
-windchillf
-dailyrainin
-weeklyrainin
-tempf
-softwaretype
-windgustmph
-rainin
-solarradiation
-UV
-humidity
-winddir
-windspeedmph
-dateutc
-realtime
-ID
-monthlyrainin
-yearlyrainin
-indoortempf
+mqtt:
+  sensor:
+    - object_id: wh2600_temperatureIndoor
+      name: "Indoor temperature"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.temperatureIndoor }}"
+      unique_id: "6682886c-86b0-4c2f-bd34-ad0d4291df58"
+      unit_of_measurement: "C"
+    - object_id: wh2600_humidityIndoor
+      name: "Indoor humidity"
+      unique_id: "0f763901-82fa-4842-acf7-ecb605f653b3"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.humidityIndoor }}"
+      unit_of_measurement: "%"
+    - object_id: wh2600_pressureAbsolute
+      name: "Absolute pressure"
+      unique_id: "7aa0169e-fd9f-4fed-8b7e-ebfb126663de"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.pressureAbsolute }}"
+      unit_of_measurement: "hpa"
+    - object_id: wh2600_pressureRelative
+      name: "Relative pressure"
+      unique_id: "cacd6e64-93a2-44e0-b357-8ac13684a666"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.pressureRelative }}"
+      unit_of_measurement: "hpa"
+    - object_id: wh2600_temperature
+      name: "Temperature"
+      unique_id: "03e3bd22-3947-4efb-b487-624553457567"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.temperature }}"
+      unit_of_measurement: "C"
+    - object_id: wh2600_humidity
+      name: "Humidity"
+      unique_id: "6a126d8b-a838-4fb4-af46-7987d86e3a33"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.humidity }}"
+      unit_of_measurement: "%"
+    - object_id: wh2600_dewPoint
+      name: "Dew point"
+      unique_id: "1b08a890-ab17-465d-97c9-5b921b10263a"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.dewPoint }}"
+      unit_of_measurement: "C"
+    - object_id: wh2600_windDir
+      name: "Wind bearing"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.windDir }}"
+      unit_of_measurement: "deg"
+    - object_id: wh2600_windDirCardinal
+      name: "Wind bearing (cardinal)"
+      unique_id: "7a9f6f16-b89b-4e30-9453-281701bc7e82"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.windDirCardinal }}"
+      unit_of_measurement: ""
+    - object_id: wh2600_windSpeed
+      name: "Wind speed"
+      unique_id: "88a66c7c-be97-48b8-8406-fe41b27a6827"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.windSpeed }}"
+      unit_of_measurement: "km/h"
+    - object_id: wh2600_windGust
+      name: "Wind gust"
+      unique_id: "88b2d39a-7153-4d79-aada-3c1f5fd6940e"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.windGust }}"
+      unit_of_measurement: "km/h"
+    - object_id: wh2600_windChill
+      name: "Wind chill"
+      unique_id: "27df4bb5-dbaa-4e6f-8ce5-4181e970f093"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.windChill }}"
+      unit_of_measurement: "C"
+    - object_id: wh2600_solarRadiation
+      name: "Solar radiation"
+      unique_id: "6e61024c-75e7-4196-a4f2-c953fe8596b6"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.solarRadiation }}"
+      unit_of_measurement: "w/m2"
+    - object_id: wh2600_uv
+      name: "UV"
+      unique_id: "4ba1c38c-e159-434e-8245-95794a9a0048"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.uv }}"
+      unit_of_measurement: ""
+    - object_id: wh2600_uvi
+      name: "UV Index"
+      unique_id: "cf1b8c2e-27cc-448e-b965-f1cb04c028e3"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.uvi }}"
+      unit_of_measurement: ""
+    - object_id: wh2600_precipHourlyRate
+      name: "Rain hourly rate"
+      unique_id: "0281a8ec-7fb8-458d-a0f1-b2d6e2c65b47"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.precipHourlyRate }}"
+      unit_of_measurement: "mm"
+    - object_id: wh2600_precipDaily
+      name: "Daily rain"
+      unique_id: "4266b583-aa12-49f7-94ac-dacab2381064"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.precipDaily }}"
+      unit_of_measurement: "mm"
+    - object_id: wh2600_precipWeekly
+      name: "Weekly rain"
+      unique_id: "ecd9d750-e115-49a0-91c2-5782135ce2cb"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.precipWeekly }}"
+      unit_of_measurement: "mm"
+    - object_id: wh2600_precipMonthly
+      name: "Monthly rain"
+      unique_id: "8a1922b9-4b30-4d13-aa54-ce390771f20c"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.precipMonthly }}"
+      unit_of_measurement: "mm"
+    - object_id: wh2600_precipYearly
+      name: "Yearly rain"
+      unique_id: "bf00ac02-5b51-4e9d-83d0-9eb8eb030256"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.precipYearly }}"
+      unit_of_measurement: "mm"
+    - object_id: wh2600_heatIndex
+      name: "Heat Index"
+      unique_id: "506dc2d9-a478-4c92-9117-985d39fc49e3"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.heatIndex }}"
+      unit_of_measurement: "C"
