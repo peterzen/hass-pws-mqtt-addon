@@ -1,0 +1,17 @@
+---
+version: "3"
+services:
+  pwsmqttdispatcher:
+    image: peterzen/pwsmqttdispatcher:0.1.1
+#    build:
+#      context: .
+    container_name: pwsmqttdispatcher
+    environment:
+      - MQTT_BROKER=10.11.50.68
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=monitor
+      - MQTT_PASSWORD=Monitor_Mqtt!
+      - MQTT_TOPIC=WundergroundUpdateReceiverIDIKISSZ2
+    ports:
+      - 8080:8080
+    restart: unless-stopped
