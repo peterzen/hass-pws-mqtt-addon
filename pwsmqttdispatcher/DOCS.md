@@ -6,7 +6,7 @@ Once installed and started, the addon periodically connects to the PWS and fetch
 
 
 ## Configuration
-|  | |
+| Option | |
 |-----------| ----------------------------------------|
 | `pws_ip`  | The IP address of the PWS observer unit |
 | `mqtt_topic`     |   MQTT topic the data is to be pushed to
@@ -17,4 +17,4 @@ Once installed and started, the addon periodically connects to the PWS and fetch
 The addon connects to the default MQTT broker configured in HASS, there is no way to configure this at this time.
 
 
-Images: weather station by Knut M. Synstad from <a href="https://thenounproject.com/browse/icons/term/weather-station/" target="_blank" title="weather station Icons">Noun Project</a>
+<small>Images: weather station by Knut M. Synstad from <a href="https://thenounproject.com/browse/icons/term/weather-station/" target="_blank" title="weather station Icons">Noun Project</a></small>
