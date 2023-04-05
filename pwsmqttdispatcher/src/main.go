@@ -3,181 +3,188 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 type WeatherData struct {
-	Id             string  `json:"id"`
-	Baromin        float64 `json:"baromin"`
-	Indoorhumidity float64 `json:"indoorhumidity"`
-	Indoortempf    float64 `json:"indoortempf"`
-	Rtfreq         float64 `json:"rtfreq"`
-	Dewptf         float64 `json:"dewptf"`
-	Windchillf     float64 `json:"windchillf"`
-	Dailyrainin    float64 `json:"dailyrainin"`
-	Weeklyrainin   float64 `json:"weeklyrainin"`
-	Tempf          float64 `json:"tempf"`
-	Windgustmph    float64 `json:"windgustmph"`
-	Rainin         float64 `json:"rainin"`
-	Solarradiation float64 `json:"solarradiation"`
-	UV             float64 `json:"UV"`
-	Humidity       float64 `json:"humidity"`
-	Winddir        float64 `json:"winddir"`
-	Windspeedmph   float64 `json:"windspeedmph"`
-	Dateutc        string  `json:"dateutc"`
-	Monthlyrainin  float64 `json:"monthlyrainin"`
-	Yearlyrainin   float64 `json:"yearlyrainin"`
+	ReceiverTime      string  `json:"receiverTime"`
+	TemperatureIndoor float64 `json:"temperatureIndoor"`
+	HumidityIndoor    float64 `json:"humidityIndoor"`
+	PressureAbsolute  float64 `json:"pressureAbsolute"`
+	PressureRelative  float64 `json:"pressureRelative"`
+	Temperature       float64 `json:"temperature"`
+	Humidity          float64 `json:"humidity"`
+	WindDir           float64 `json:"windDir"`
+	WindSpeed         float64 `json:"windSpeed"`
+	WindGust          float64 `json:"windGust"`
+	SolarRadiation    float64 `json:"solarRadiation"`
+	Uv                float64 `json:"uv"`
+	Uvi               float64 `json:"uvi"`
+	PrecipHourlyRate  float64 `json:"precipHourlyRate"`
+	PrecipDaily       float64 `json:"precipDaily"`
+	PrecipWeekly      float64 `json:"precipWeekly"`
+	PrecipMonthly     float64 `json:"precipMonthly"`
+	PrecipYearly      float64 `json:"precipYearly"`
 }
 
-func extractWeatherData(params url.Values) (WeatherData, error) {
-	wd := WeatherData{}
+var pwsIp string
+var fetchInterval int
+var debugEnabled bool
 
-	// Get values from query parameters
-	id := params.Get("ID")
-	baromin, err := strconv.ParseFloat(params.Get("baromin"), 64)
-	if err != nil {
-		return wd, err
-	}
-	indoorhumidity, err := strconv.ParseFloat(params.Get("indoorhumidity"), 64)
-	if err != nil {
-		return wd, err
-	}
-	indoortempf, err := strconv.ParseFloat(params.Get("indoortempf"), 64)
-	if err != nil {
-		return wd, err
-	}
-	rtfreq, err := strconv.ParseFloat(params.Get("rtfreq"), 64)
-	if err != nil {
-		return wd, err
-	}
-	dewptf, err := strconv.ParseFloat(params.Get("dewptf"), 64)
-	if err != nil {
-		return wd, err
-	}
-	windchillf, err := strconv.ParseFloat(params.Get("windchillf"), 64)
-	if err != nil {
-		return wd, err
-	}
-	dailyrainin, err := strconv.ParseFloat(params.Get("dailyrainin"), 64)
-	if err != nil {
-		return wd, err
-	}
-	weeklyrainin, err := strconv.ParseFloat(params.Get("weeklyrainin"), 64)
-	if err != nil {
-		return wd, err
-	}
-	tempf, err := strconv.ParseFloat(params.Get("tempf"), 64)
-	if err != nil {
-		return wd, err
-	}
-	windgustmph, err := strconv.ParseFloat(params.Get("windgustmph"), 64)
-	if err != nil {
-		return wd, err
-	}
-	rainin, err := strconv.ParseFloat(params.Get("rainin"), 64)
-	if err != nil {
-		return wd, err
-	}
-	solarradiation, err := strconv.ParseFloat(params.Get("solarradiation"), 64)
-	if err != nil {
-		return wd, err
-	}
-	UV, err := strconv.ParseFloat(params.Get("UV"), 64)
-	if err != nil {
-		return wd, err
-	}
-	humidity, err := strconv.ParseFloat(params.Get("humidity"), 64)
-	if err != nil {
-		return wd, err
-	}
-	winddir, err := strconv.ParseFloat(params.Get("winddir"), 64)
-	if err != nil {
-		return wd, err
-	}
-	windspeedmph, err := strconv.ParseFloat(params.Get("windspeedmph"), 64)
-	if err != nil {
-		return wd, err
-	}
-	dateutc := params.Get("dateutc")
-	monthlyrainin, err := strconv.ParseFloat(params.Get("monthlyrainin"), 64)
-	if err != nil {
-		return wd, err
-	}
-	yearlyrainin, err := strconv.ParseFloat(params.Get("yearlyrainin"), 64)
-	if err != nil {
-		return wd, err
-	}
+func fetchDocumentFromPws() *goquery.Document {
 
-	// Set values in WeatherData struct
-	wd.Id = id
-	wd.Baromin = baromin
-	wd.Indoorhumidity = indoorhumidity
-	wd.Indoortempf = indoortempf
-	wd.Rtfreq = rtfreq
-	wd.Dewptf = dewptf
-	wd.Windchillf = windchillf
-	wd.Dailyrainin = dailyrainin
-	wd.Weeklyrainin = weeklyrainin
-	wd.Tempf = tempf
-	wd.Windgustmph = windgustmph
-	wd.Rainin = rainin
-	wd.Solarradiation = solarradiation
-	wd.UV = UV
-	wd.Humidity = humidity
-	wd.Winddir = winddir
-	wd.Windspeedmph = windspeedmph
-	wd.Dateutc = dateutc
-	wd.Monthlyrainin = monthlyrainin
-	wd.Yearlyrainin = yearlyrainin
-	return wd, nil
-}
-
-var wuSubmitUrl = "http://rtupdate.wunderground.com/weatherstation/updateweatherstation.php"
-
-func submitUpdateToWunderground(r *http.Request) {
-	// Submit the original HTTP request to rtupdate.wunderground.com
-	originalPayload := r.URL.Query().Encode()
-	resp, err := http.Post(wuSubmitUrl, "application/x-www-form-urlencoded", strings.NewReader(originalPayload))
+	pwsUrl := fmt.Sprintf("http://%s/livedata.htm", pwsIp)
+	// Read the HTML file
+	resp, err := http.Get(pwsUrl)
 	if err != nil {
-		log.Printf("Failed to submit original HTTP request: %v", err)
-		return
+		log.Printf("Failed to connect to PWS: %s\n", err)
+		return nil
 	}
 	defer resp.Body.Close()
-	log.Printf("Submitted data to %s\n", wuSubmitUrl)
+
+	htmlData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Failed to fetch data from PWS: %s\n", err)
+		return nil
+	}
+
+	// Parse the HTML file with goquery
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(htmlData)))
+
+	if err != nil {
+		log.Printf("Failed to process HTML: %s\n", err)
+		return nil
+	}
+	if debugEnabled {
+		log.Printf("Fetched data from PWS\n")
+	}
+	return doc
 }
 
-func main() {
+func parseFloat(s string) float64 {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0
+	}
+	return f
+}
+func parseHtml(doc *goquery.Document) []byte {
+
+	var weatherData WeatherData
+
+	doc.Find("table").Each(func(i int, s *goquery.Selection) {
+
+		rows := s.Find("tr")
+
+		// parse the table rows and extract the data
+		rows.Each(func(i int, s *goquery.Selection) {
+			value := s.Find("input").AttrOr("value", "")
+
+			switch i {
+			case 8:
+				weatherData.ReceiverTime = value
+			case 12:
+				weatherData.TemperatureIndoor = parseFloat(value)
+			case 13:
+				weatherData.HumidityIndoor = parseFloat(value)
+			case 14:
+				weatherData.PressureAbsolute = parseFloat(value)
+			case 15:
+				weatherData.PressureRelative = parseFloat(value)
+			case 16:
+				weatherData.Temperature = parseFloat(value)
+			case 17:
+				weatherData.Humidity = parseFloat(value)
+			case 18:
+				weatherData.WindDir = parseFloat(value)
+			case 19:
+				weatherData.WindSpeed = parseFloat(value)
+			case 20:
+				weatherData.WindGust = parseFloat(value)
+			case 21:
+				weatherData.SolarRadiation = parseFloat(value)
+			case 22:
+				weatherData.Uv = parseFloat(value)
+			case 23:
+				weatherData.Uvi = parseFloat(value)
+			case 24:
+				weatherData.PrecipHourlyRate = parseFloat(value)
+			case 25:
+				weatherData.PrecipDaily = parseFloat(value)
+			case 26:
+				weatherData.PrecipWeekly = parseFloat(value)
+			case 27:
+				weatherData.PrecipMonthly = parseFloat(value)
+			case 28:
+				weatherData.PrecipYearly = parseFloat(value)
+			default:
+				return
+			}
+		})
+	})
+
+	// Convert the variables to JSON and print the result
+	jsonData, err := json.Marshal(weatherData)
+	if err != nil {
+		log.Printf("Unable to marshal JSON: %s\n", err)
+		return nil
+	}
+	return jsonData
+}
+
+func newMqttClient() mqtt.Client {
+
+	pwsIp = os.Getenv("PWS_IP")
+	if pwsIp == "" {
+		log.Fatalf("PWS_IP env var undefined")
+	}
+	fetchIntervalStr := os.Getenv("FETCH_INTERVAL")
+	if fetchIntervalStr == "" {
+		log.Fatalf("FETCH_INTERVAL env var undefined")
+	}
+	var err error
+	fetchInterval, err = strconv.Atoi(fetchIntervalStr)
+	if err != nil {
+		log.Fatalf("Invalid FETCH_INTERVAL value: %s\n", fetchIntervalStr)
+	}
+
 	// Get MQTT connection parameters from environment variables
 	mqttBroker := os.Getenv("MQTT_HOST")
+	if mqttBroker == "" {
+		log.Fatalf("MQTT_HOST not configured\n")
+	}
 	mqttPort := os.Getenv("MQTT_PORT")
 	if mqttPort == "" {
 		mqttPort = "1883"
 	}
 	mqttUser := os.Getenv("MQTT_USER")
-	mqttPassword := os.Getenv("MQTT_PASSWORD")
-	mqttTopic := os.Getenv(("MQTT_TOPIC"))
-	if mqttTopic == "" {
-		mqttTopic = "personal_weather_station"
+	if mqttUser == "" {
+		log.Fatalf("MQTT_USER not configured\n")
 	}
+	mqttPassword := os.Getenv("MQTT_PASSWORD")
 
+	mqttClientId := os.Getenv("MQTT_CLIENT_ID")
+	if mqttClientId == "" {
+		mqttClientId = "pwsmqttdispatcher"
+	}
 	// Set up MQTT client options
 	mqttConnUri := fmt.Sprintf("tcp://%s:%s", mqttBroker, mqttPort)
 	opts := mqtt.NewClientOptions().AddBroker(mqttConnUri)
-	opts.SetClientID("pwsmqttdispatcher")
+	opts.SetClientID(mqttClientId)
 	opts.SetUsername(mqttUser)
 	opts.SetPassword(mqttPassword)
 
 	// Create MQTT client
 	client := mqtt.NewClient(opts)
-
-	log.Printf("Connecting to MQTT broker %s\n", mqttConnUri)
 
 	// Connect to MQTT broker
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
@@ -185,40 +192,44 @@ func main() {
 		log.Fatalf("Cannot connect to MQTT broker: %s\n", token.Error())
 	}
 	defer client.Disconnect(250)
+
 	log.Printf("Connected to MQTT broker %s\n", opts.Servers[0])
+	return client
+}
 
-	// Set up HTTP server to listen for incoming requests
-	http.HandleFunc("/weatherstation/updateweatherstation.php", func(w http.ResponseWriter, r *http.Request) {
+func main() {
 
-		log.Printf("Update received from %s\n", r.RemoteAddr)
+	debugEnabled = false
 
-		// Extract weather data from request
-		weatherData, err := extractWeatherData(r.URL.Query())
-		if err != nil {
-			http.Error(w, "Invalid weather data: "+err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		// Publish weather data to MQTT topic in JSON format
-		jsonData, err := json.Marshal(weatherData)
-		if err != nil {
-			http.Error(w, "Error marshalling weather data to JSON: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		token := client.Publish(mqttTopic, 0, false, jsonData)
-		token.Wait()
-
-		log.Printf("Published weather data to topic %s\n", mqttTopic)
-
-		// Return success status
-		w.WriteHeader(http.StatusOK)
-
-		submitUpdateToWunderground(r)
-	})
-
-	// Start HTTP server
-	log.Println("Starting server on :8765")
-	if err := http.ListenAndServe(":8765", nil); err != nil {
-		log.Fatal(err)
+	if os.Getenv("DEBUG_ENABLED") == "true" {
+		debugEnabled = true
 	}
+
+	client := newMqttClient()
+
+	mqttTopic := os.Getenv(("MQTT_TOPIC"))
+	if mqttTopic == "" {
+		mqttTopic = "personal_weather_station"
+	}
+	log.Printf("Publishing to MQTT topic %s\n", mqttTopic)
+
+	for {
+		doc := fetchDocumentFromPws()
+
+		if doc != nil {
+			weatherData := parseHtml(doc)
+			if weatherData != nil {
+				token := client.Publish(mqttTopic, 0, false, weatherData)
+				if debugEnabled {
+					log.Printf("Published data to MQTT topic\n")
+				}
+				token.Wait()
+				if debugEnabled {
+					log.Println(string(weatherData))
+				}
+			}
+		}
+		time.Sleep(time.Duration(fetchInterval) * time.Second)
+	}
+
 }

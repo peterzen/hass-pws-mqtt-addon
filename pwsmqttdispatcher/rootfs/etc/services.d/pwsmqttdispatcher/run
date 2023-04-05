@@ -11,7 +11,11 @@ export MQTT_HOST=$(bashio::services mqtt "host")
 export MQTT_USER=$(bashio::services mqtt "username")
 export MQTT_PASSWORD=$(bashio::services mqtt "password")
 export MQTT_TOPIC="$(bashio::config 'mqtt_topic')"
+export MQTT_CLIENT_ID="$(bashio::config 'mqtt_client_id')"
+export PWS_IP="$(bashio::config 'pws_ip')"
+export FETCH_INTERVAL="$(bashio::config 'fetch_interval')"
+export DEBUG_ENABLED="$(bashio::config 'debug_enabled')"
 
-bashio::log.info "Starting pwsmqttdispatcher, broker: ${MQTT_HOST}, MQTT topic: ${MQTT_TOPIC}"
+bashio::log.info "Starting pwsmqttdispatcher"
 
 exec /usr/bin/pwsmqttdispatcher
