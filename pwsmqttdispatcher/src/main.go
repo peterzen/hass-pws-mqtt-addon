@@ -205,7 +205,7 @@ func calculateWindChill(windSpeed float64, temp float64) float64 {
 	T := temp*1.8 + 32        // convert temperature to Fahrenheit
 	WCI := 35.74 + 0.6215*T - 35.75*math.Pow(V, 0.16) + 0.4275*T*math.Pow(V, 0.16)
 	windChill := (WCI - 32) * 5 / 9 // convert wind chill to Celsius
-	return windChill
+	return math.Round(windChill*10) / 10
 }
 
 func calculateDewPoint(tempCelsius, humidity float64) float64 {
@@ -213,7 +213,7 @@ func calculateDewPoint(tempCelsius, humidity float64) float64 {
 	b := 237.7
 	alpha := ((a * tempCelsius) / (b + tempCelsius)) + math.Log(humidity/100.0)
 	dewPointCelsius := (b * alpha) / (a - alpha)
-	return dewPointCelsius
+	return math.Round(dewPointCelsius*10) / 10
 }
 
 func addCalculatedData(wd WeatherData) WeatherData {
