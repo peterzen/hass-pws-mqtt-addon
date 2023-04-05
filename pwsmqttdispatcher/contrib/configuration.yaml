@@ -1,34 +1,81 @@
-# configuration.yaml
+
+- name: dewpt
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json.dewptf }}"
+  unit_of_measurement: ""
+- name: humidity
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json.humidity }}"
+  unit_of_measurement: "%"
+- name: precipRate
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: precipTotal
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: pressure
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: solarRadiation
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: stationID
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: temp
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: uv
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: windChill
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: winddir
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: windDirectionName
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: windGust
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
+- name: windSpeed
+  state_topic: "weatherstation/data"
+  value_template: "{{ value_json. }}"
+  unit_of_measurement: ""
 
 
-sensor:
-  - platform: mqtt
-    name: "PWS ITAMASI1"
-    state_topic: "WundergroundUpdateReceiverIDIKISSZ2"
-    json_attributes_topic: "WundergroundUpdateReceiverIDIKISSZ2"
-    value_template: "{{ value_json.tempf }}"
-    force_update: true
-
-weather:
-  - platform: mqtt
-    name: "Current Conditions"
-    condition_topic: "weather/data"
-    temperature_topic: "weather/data"
-    humidity_topic: "weather/data"
-    pressure_topic: "weather/data"
-    wind_speed_topic: "weather/data"
-    wind_bearing_topic: "weather/data"
-    forecast_topic: "weather/forecast"
-    forecast_template: "{{ value_json.forecast }}"
-    condition_template: "{{ value_json.weather }}"
-    temperature_unit: "F"
-    humidity_unit: "%"
-    pressure_unit: "inHg"
-    wind_unit: "mph"
-
-  - platform: openweathermap
-    api_key: YOUR_API_KEY
-    name: My Weather Forecast
-    latitude: 37.7749
-    longitude: -122.4194
-    mode: daily
+indoorhumidity
+baromin
+rtfreq
+dewptf
+windchillf
+dailyrainin
+weeklyrainin
+tempf
+softwaretype
+windgustmph
+rainin
+solarradiation
+UV
+humidity
+winddir
+windspeedmph
+dateutc
+realtime
+ID
+monthlyrainin
+yearlyrainin
+indoortempf
