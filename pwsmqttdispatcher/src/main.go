@@ -141,7 +141,13 @@ func parseHtml(doc *goquery.Document) []byte {
 	return jsonData
 }
 
-func newMqttClient() mqtt.Client {
+func main() {
+
+	debugEnabled = false
+
+	if os.Getenv("DEBUG_ENABLED") == "true" {
+		debugEnabled = true
+	}
 
 	pwsIp = os.Getenv("PWS_IP")
 	if pwsIp == "" {
@@ -194,18 +200,6 @@ func newMqttClient() mqtt.Client {
 	defer client.Disconnect(250)
 
 	log.Printf("Connected to MQTT broker %s\n", opts.Servers[0])
-	return client
-}
-
-func main() {
-
-	debugEnabled = false
-
-	if os.Getenv("DEBUG_ENABLED") == "true" {
-		debugEnabled = true
-	}
-
-	client := newMqttClient()
 
 	mqttTopic := os.Getenv(("MQTT_TOPIC"))
 	if mqttTopic == "" {
@@ -221,7 +215,7 @@ func main() {
 			if weatherData != nil {
 				token := client.Publish(mqttTopic, 0, false, weatherData)
 				if debugEnabled {
-					log.Printf("Published data to MQTT topic\n")
+					log.Printf("Published data to #%s\n", mqttTopic)
 				}
 				token.Wait()
 				if debugEnabled {
