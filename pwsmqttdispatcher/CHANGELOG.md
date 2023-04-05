@@ -1,3 +1,9 @@
+## 0.1.19
+
+- Rounding calculated values to 1 decimal
+- Added info about supported weather stations
+
+
 ## 0.1.18
 
 - Calculate dew point, wind chill, cardinal wind direction
