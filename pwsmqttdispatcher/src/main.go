@@ -172,9 +172,15 @@ func windDirToCardinal(windDirDeg int) string {
 	wind := windDirDeg % 360
 	winddiroffset := (float64(wind) + (360.0 / 32.0)) / 360.0
 	winddiridx := int(math.Floor(winddiroffset / (1.0 / 16.0)))
-	winddir := dir[winddiridx]
 
-	return winddir + " (" + strconv.Itoa(wind) + "°)"
+	if winddiridx >= len(dir) {
+		if debugEnabled {
+			log.Printf("windDirToCardinal calculated invalid index %d (deg: %d)\n", winddiridx, windDirDeg)
+		}
+		return ""
+	}
+	winddir := dir[winddiridx]
+	return winddir
 }
 
 func dateToUnixTimestamp(dateStr string) (int64, error) {
@@ -205,7 +211,7 @@ func calculateWindChill(windSpeed float64, temp float64) float64 {
 	T := temp*1.8 + 32        // convert temperature to Fahrenheit
 	WCI := 35.74 + 0.6215*T - 35.75*math.Pow(V, 0.16) + 0.4275*T*math.Pow(V, 0.16)
 	windChill := (WCI - 32) * 5 / 9 // convert wind chill to Celsius
-	return math.Round(windChill*10) / 10
+	return windChill
 }
 
 func calculateDewPoint(tempCelsius, humidity float64) float64 {
@@ -213,7 +219,7 @@ func calculateDewPoint(tempCelsius, humidity float64) float64 {
 	b := 237.7
 	alpha := ((a * tempCelsius) / (b + tempCelsius)) + math.Log(humidity/100.0)
 	dewPointCelsius := (b * alpha) / (a - alpha)
-	return math.Round(dewPointCelsius*10) / 10
+	return dewPointCelsius
 }
 
 func addCalculatedData(wd WeatherData) WeatherData {
