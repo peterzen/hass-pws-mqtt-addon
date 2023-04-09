@@ -6,6 +6,10 @@ description: Push weather station (PWS) data to MQTT
 url: "https://github.com/peterzen/haas-pws-mqtt-addon/tree/main/pwsmqttdispatcher"
 arch:
   - amd64
+  - aarch64
+  - armhf
+  - armv7
+  - i386
 init: false
 options:
   pws_ip: "127.0.0.1"
