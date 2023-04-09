@@ -7,7 +7,6 @@ url: "https://github.com/peterzen/haas-pws-mqtt-addon/tree/main/pwsmqttdispatche
 arch:
   - amd64
 init: false
-startup: application
 options:
   pws_ip: "127.0.0.1"
   mqtt_topic: "pwsmqttdispatcher"
@@ -21,6 +20,5 @@ schema:
   fetch_interval: "int"
   debug_enabled: "bool"
 image: "docker.io/peterzen/pwsmqttdispatcher"
-host_network: false
 services:
   - mqtt:want
