@@ -9,5 +9,5 @@ Supported weather stations: tested on Renkforce WH260, probably also supports Fr
 
 Add this URL to your HAAS add-on repositories:
 
-https://github.com/peterzen/haas-pws-mqtt-addon
+https://github.com/peterzen/hass-pws-mqtt-addon
 
