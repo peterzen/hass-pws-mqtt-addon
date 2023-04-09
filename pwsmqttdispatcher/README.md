@@ -4,7 +4,7 @@ This Home Assistant add-on retrieves live weather data from a WH2600 personal we
 
 Add this URL to your HAAS add-on repositories:
 
-https://github.com/peterzen/haas-pws-mqtt-addon
+https://github.com/peterzen/hass-pws-mqtt-addon
 
 
 
