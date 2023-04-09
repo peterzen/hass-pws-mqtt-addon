@@ -8,7 +8,7 @@ build_from:
 labels:
   org.opencontainers.image.title: "PWS to MQTT dispatcher addon"
   org.opencontainers.image.description: "Push weather station (PWS) data to MQTT."
-  org.opencontainers.image.source: "https://github.com/peterzen/haas-pws-mqtt-addon"
+  org.opencontainers.image.source: "https://github.com/peterzen/hass-pws-mqtt-addon"
   org.opencontainers.image.licenses: "Apache License 2.0"
 args:
   TEMPIO_VERSION: "2021.09.0"
