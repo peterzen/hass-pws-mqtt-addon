@@ -1,6 +1,6 @@
 # https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
 name: Froggle HAAS addon repo
-url: 'https://github.com/peterzen/haas-pws-mqtt-addon'
+url: 'https://github.com/peterzen/hass-pws-mqtt-addon'
 maintainer: Peter Banik <peter@froggle.org>
 
 
