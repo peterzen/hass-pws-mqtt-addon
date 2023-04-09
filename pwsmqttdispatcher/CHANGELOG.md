@@ -1,3 +1,7 @@
+## 0.1.20
+
+- Fixed index overrun problem in windDirToCardinal() function
+
 ## 0.1.19
 
 - Rounding calculated values to 1 decimal
