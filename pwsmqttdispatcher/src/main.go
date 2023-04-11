@@ -224,22 +224,26 @@ func calculateDewPoint(tempCelsius, humidity float64) float64 {
 
 func addCalculatedData(wd WeatherData) WeatherData {
 	heatIndex := calculateHeatIndex(wd.Temperature, wd.Humidity)
-	wd.HeatIndex = heatIndex
+	wd.HeatIndex = roundFloatTo1Decimal(heatIndex)
 
 	windDirCardinal := windDirToCardinal(int(wd.WindDir))
 	wd.WindDirCardinal = windDirCardinal
 
 	windChill := calculateWindChill(wd.WindSpeed, wd.Temperature)
-	wd.WindChill = windChill
+	wd.WindChill = roundFloatTo1Decimal(windChill)
 
 	dewPoint := calculateDewPoint(wd.Temperature, wd.Humidity)
-	wd.DewPoint = dewPoint
+	wd.DewPoint = roundFloatTo1Decimal(dewPoint)
 
 	recTs, err := dateToUnixTimestamp(wd.ReceiverTime)
 	if err == nil {
 		wd.ReceiverTimestamp = recTs
 	}
 	return wd
+}
+
+func roundFloatTo1Decimal(f float64) float64 {
+	return math.Round(f*10) / 10
 }
 
 func main() {
