@@ -1,3 +1,8 @@
+## 0.1.22
+
+- Image repository changed to ghcr.io, addon now available on all supported HASS platforms
+- Fixed the value rounding in calculated fields
+
 ## 0.1.20
 
 - Fixed index overrun problem in windDirToCardinal() function
