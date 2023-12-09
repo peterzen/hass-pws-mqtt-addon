@@ -1,6 +1,7 @@
 mqtt:
   sensor:
     - object_id: wh2600_temperatureIndoor
+      unique_id: 6b464994-96b2-11ee-b9d1-0242ac120002
       name: "Indoor temperature"
       state_topic: "weather_station/data"
       value_template: "{{ value_json.temperatureIndoor | float }}"
