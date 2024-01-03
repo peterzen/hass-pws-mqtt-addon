@@ -2,7 +2,7 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-dockerfile
 ARG BUILD_FROM
 
-FROM golang AS build
+FROM golang:1.21 AS build
 WORKDIR /root/
 COPY ./src/ .
 RUN CGO_ENABLED=0 GO111MODULE=on go build
