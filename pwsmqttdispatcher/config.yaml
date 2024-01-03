@@ -23,6 +23,6 @@ schema:
   mqtt_client_id: "str?"
   fetch_interval: "int"
   debug_enabled: "bool"
-image: "ghcr.io/peterzen/pwsmqttdispatcher"
+image: "ghcr.io/peterzen/{arch}-pwsmqttdispatcher"
 services:
   - mqtt:want

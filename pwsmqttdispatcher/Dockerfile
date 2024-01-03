@@ -1,17 +1,20 @@
 
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-dockerfile
 ARG BUILD_FROM
+ARG BUILD_ARCH
 
-FROM golang:1.21 AS build
+FROM golang AS build
+ARG BUILD_ARCH
 WORKDIR /root/
 COPY ./src/ .
-RUN CGO_ENABLED=0 GO111MODULE=on go build
+ENV BUILD_ARCH=${BUILD_ARCH}
+RUN ./build.sh
+
 
 FROM $BUILD_FROM
 
 ARG TEMPIO_VERSION 
 ARG BUILD_ARCH
-
 
 # Execute during the build of the image
 RUN \
@@ -24,4 +27,4 @@ COPY rootfs /
 # Copy pwsmqttdispatcher binary
 COPY --from=build /root/pwsmqttdispatcher /usr/bin
 
-# ENTRYPOINT [ "/bin/sh" ]
+ENTRYPOINT [ "/usr/bin/pwsmqttdispatcher" ]

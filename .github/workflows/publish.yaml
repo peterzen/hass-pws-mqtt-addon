@@ -7,21 +7,29 @@ on:
 
 jobs:
   publish:
-    name: Publish
+    name: Build and publish addon
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["aarch64", "amd64", "armhf", "armv7", "i386"]
+
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
+
       - name: Login to GH Container registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish
+
+      - name: Publish ${{ matrix.arch }}
         uses: home-assistant/builder@2023.12.0
         with:
           args: |
+            --addon \
             --all \
             --target /data/pwsmqttdispatcher \
+            --image "ghcr.io/${{ github.repository_owner }}/${{ matrix.arch }}-pwsmqttdispatcher" \
             --docker-hub "ghcr.io/${{ github.repository_owner }}"
