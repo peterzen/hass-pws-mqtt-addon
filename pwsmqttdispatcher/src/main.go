@@ -1,9 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xhhuango/json"
 
 	"github.com/PuerkitoBio/goquery"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -57,7 +58,7 @@ func fetchDocumentFromPws() *goquery.Document {
 	}
 	defer resp.Body.Close()
 
-	htmlData, err := ioutil.ReadAll(resp.Body)
+	htmlData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to fetch data from PWS: %s\n", err)
 		return nil
@@ -79,7 +80,7 @@ func fetchDocumentFromPws() *goquery.Document {
 func parseFloat(s string) float64 {
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0
+		return math.NaN()
 	}
 	return f
 }
