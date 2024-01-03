@@ -1,3 +1,7 @@
+## 0.1.23
+
+ - NaN values received from the PWS are now passed through to MQTT, instead of throwing an error.
+ 
 ## 0.1.22
 
 - Image repository changed to ghcr.io, addon now available on all supported HASS platforms
