@@ -1,3 +1,7 @@
+## 0.1.24
+
+ - Multi arch builds now work correctly on both ARM architecture.
+
 ## 0.1.23
 
  - NaN values received from the PWS are now passed through to MQTT, instead of throwing an error.
