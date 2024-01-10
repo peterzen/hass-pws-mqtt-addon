@@ -2,8 +2,8 @@
 # PWS to MQTT dispatcher addon for Home Assistant
 
 [![Lint](https://github.com/peterzen/hass-pws-mqtt-addon/actions/workflows/lint.yaml/badge.svg)](https://github.com/peterzen/hass-pws-mqtt-addon/actions/workflows/lint.yaml)
-
 [![Test](https://github.com/peterzen/hass-pws-mqtt-addon/actions/workflows/test.yaml/badge.svg)](https://github.com/peterzen/hass-pws-mqtt-addon/actions/workflows/test.yaml)
+[![Publish](https://github.com/peterzen/hass-pws-mqtt-addon/actions/workflows/publish.yaml/badge.svg)](https://github.com/peterzen/hass-pws-mqtt-addon/actions/workflows/publish.yaml)
 
 This add-on retrieves live weather data from a WH2600 personal weather station (PWS) and publishes it to an MQTT topic where HAAS can access it as sensor information.
 
