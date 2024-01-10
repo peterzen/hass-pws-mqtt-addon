@@ -1,6 +1,6 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
 name: PWS to MQTT dispatcher addon
-version: "0.1.24"
+version: "0.1.25"
 slug: pwsmqttdispatcher
 description: Push weather station (PWS) data to MQTT
 url: "https://github.com/peterzen/hass-pws-mqtt-addon/tree/main/pwsmqttdispatcher"
