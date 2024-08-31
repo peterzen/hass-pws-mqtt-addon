@@ -25,13 +25,13 @@ mqtt:
       value_template: "{{ value_json.pressureRelative }}"
       unit_of_measurement: "hpa"
     - object_id: wh2600_temperature
-      name: "Temperature"
+      name: "Outdoor temperature"
       unique_id: "03e3bd22-3947-4efb-b487-624553457567"
       state_topic: "weather_station/data"
       value_template: "{{ value_json.temperature }}"
       unit_of_measurement: "C"
     - object_id: wh2600_humidity
-      name: "Humidity"
+      name: "Outdoor humidity"
       unique_id: "6a126d8b-a838-4fb4-af46-7987d86e3a33"
       state_topic: "weather_station/data"
       value_template: "{{ value_json.humidity }}"
@@ -53,7 +53,6 @@ mqtt:
       unique_id: "7a9f6f16-b89b-4e30-9453-281701bc7e82"
       state_topic: "weather_station/data"
       value_template: "{{ value_json.windDirCardinal }}"
-      unit_of_measurement: ""
     - object_id: wh2600_windSpeed
       name: "Wind speed"
       unique_id: "88a66c7c-be97-48b8-8406-fe41b27a6827"
@@ -130,5 +129,4 @@ mqtt:
       name: "Last update"
       unique_id: "506dc2d9-a478-4c92-9117-985d39fc49e4"
       state_topic: "weather_station/data"
-      value_template: "{{ value_json.receiverTimestamp  | timestamp_custom('%Y-%m-%d %H:%M:%S') }}"
-      unit_of_measurement: ""
+      value_template: "{{ value_json.receiverTime | string }}"
