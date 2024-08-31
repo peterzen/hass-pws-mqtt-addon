@@ -1,3 +1,7 @@
+## 0.1.26
+ - More accurate heat index, wind chill, dewpoint values using libwx
+ - Bump home-assistant/builder to latest
+
 ## 0.1.24
 
  - NaN values received from the PWS are now passed through to MQTT, instead of throwing an error.
