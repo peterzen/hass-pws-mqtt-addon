@@ -14,6 +14,7 @@ import (
 	"github.com/xhhuango/json"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/cdzombak/libwx"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -152,22 +153,6 @@ func weatherDataAsJson(wd WeatherData) []byte {
 	return jsonData
 }
 
-func calculateHeatIndex(temperature, humidity float64) float64 {
-	// Convert temperature to Fahrenheit
-	temperature = (temperature * 1.8) + 32
-
-	// https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
-	if temperature >= 80 {
-		// Calculate the heat index in Fahrenheit
-		heatIndex := -42.379 + 2.04901523*temperature + 10.14333127*humidity - 0.22475541*temperature*humidity - 6.83783e-3*math.Pow(temperature, 2) - 5.481717e-2*math.Pow(humidity, 2) + 1.22874e-3*math.Pow(temperature, 2)*humidity + 8.5282e-4*temperature*math.Pow(humidity, 2) - 1.99e-6*math.Pow(temperature, 2)*math.Pow(humidity, 2)
-
-		// Convert heat index back to Celsius
-		heatIndex = (heatIndex - 32) * (5.0 / 9.0)
-		return heatIndex
-	}
-	return 0
-}
-
 func windDirToCardinal(windDirDeg int) string {
 	dir := []string{"N ⬇️", "NNE ⬇️", "NE ↙️", "ENE ⬅️", "E ⬅️", "ESE ⬅️", "SE ↖️", "SSE ⬆️", "S ⬆️", "SSW ⬆️", "SW ↗️", "WSW ➡️", "W ➡️", "WNW ➡️", "NW ↘️", "NNW ⬇️"}
 	wind := windDirDeg % 360
@@ -199,42 +184,19 @@ func dateToUnixTimestamp(dateStr string) (int64, error) {
 	}
 	return t.Unix(), nil
 }
-func calculateWindChill(windSpeed float64, temp float64) float64 {
-	// Calculate the wind chill temperature in Celsius using the National Weather Service's formula
-	// where T is the air temperature in Celsius and V is the wind speed in km/h
-
-	// A Wind Chill value cannot be calculated for wind speeds less than 4.8 kilometers/hour
-	if windSpeed < 4.8 {
-		return temp
-	}
-
-	V := windSpeed / 1.609344 // convert wind speed to miles per hour
-	T := temp*1.8 + 32        // convert temperature to Fahrenheit
-	WCI := 35.74 + 0.6215*T - 35.75*math.Pow(V, 0.16) + 0.4275*T*math.Pow(V, 0.16)
-	windChill := (WCI - 32) * 5 / 9 // convert wind chill to Celsius
-	return windChill
-}
-
-func calculateDewPoint(tempCelsius, humidity float64) float64 {
-	a := 17.27
-	b := 237.7
-	alpha := ((a * tempCelsius) / (b + tempCelsius)) + math.Log(humidity/100.0)
-	dewPointCelsius := (b * alpha) / (a - alpha)
-	return dewPointCelsius
-}
 
 func addCalculatedData(wd WeatherData) WeatherData {
-	heatIndex := calculateHeatIndex(wd.Temperature, wd.Humidity)
-	wd.HeatIndex = roundFloatTo1Decimal(heatIndex)
+	heatIndex := libwx.HeatIndexC(libwx.TempC(wd.Temperature), libwx.RelHumidity(wd.Humidity))
+	wd.HeatIndex = roundFloatTo1Decimal(float64(heatIndex))
 
 	windDirCardinal := windDirToCardinal(int(wd.WindDir))
 	wd.WindDirCardinal = windDirCardinal
 
-	windChill := calculateWindChill(wd.WindSpeed, wd.Temperature)
-	wd.WindChill = roundFloatTo1Decimal(windChill)
+	windChill := libwx.WindChillC(libwx.TempC(wd.Temperature), libwx.SpeedKmH(wd.WindSpeed).Mph())
+	wd.WindChill = roundFloatTo1Decimal(float64(windChill))
 
-	dewPoint := calculateDewPoint(wd.Temperature, wd.Humidity)
-	wd.DewPoint = roundFloatTo1Decimal(dewPoint)
+	dewPoint := libwx.DewPointC(libwx.TempC(wd.Temperature), libwx.RelHumidity(wd.Humidity))
+	wd.DewPoint = roundFloatTo1Decimal(float64(dewPoint))
 
 	recTs, err := dateToUnixTimestamp(wd.ReceiverTime)
 	if err == nil {
