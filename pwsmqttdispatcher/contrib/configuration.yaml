@@ -132,3 +132,23 @@ mqtt:
       state_topic: "weather_station/data"
       value_template: "{{ value_json.receiverTimestamp  | timestamp_custom('%Y-%m-%d %H:%M:%S') }}"
       unit_of_measurement: ""
+    - object_id: wh2600_battery_indoor
+      name: "Indoor sensor battery"
+      unique_id: "ee726d0d-f0ab-4ae7-82a2-35bde5fdb279"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.indoorSensorBattery }}"
+    - object_id: wh2600_sensor_id_indoor
+      name: "Indoor sensor ID"
+      unique_id: "b254bf9f-cbf5-4d1c-a8d4-8aab0b88cc20"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.indoorSensorId }}"
+    - object_id: wh2600_battery_outdoor
+      name: "Outdoor sensor battery"
+      unique_id: "e793fb44-1a2f-44aa-8fc0-6f2107edcc4b"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.outdoorSensorBattery }}"
+    - object_id: wh2600_sensor_id_outdoor
+      name: "Outdoor sensor ID"
+      unique_id: "5fbb9b78-ece6-45d2-ae3f-f8ac01af2cd7"
+      state_topic: "weather_station/data"
+      value_template: "{{ value_json.outdoorSensorId }}"
