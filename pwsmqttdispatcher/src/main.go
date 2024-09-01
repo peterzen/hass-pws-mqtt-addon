@@ -19,29 +19,33 @@ import (
 )
 
 type WeatherData struct {
-	ReceiverTime      string  `json:"receiverTime"`
-	ReceiverTimestamp int64   `json:"receiverTimestamp"`
-	TemperatureIndoor float64 `json:"temperatureIndoor"`
-	HumidityIndoor    float64 `json:"humidityIndoor"`
-	PressureAbsolute  float64 `json:"pressureAbsolute"`
-	PressureRelative  float64 `json:"pressureRelative"`
-	Temperature       float64 `json:"temperature"`
-	Humidity          float64 `json:"humidity"`
-	DewPoint          float64 `json:"dewPoint"`
-	WindDir           float64 `json:"windDir"`
-	WindDirCardinal   string  `json:"windDirCardinal"`
-	WindSpeed         float64 `json:"windSpeed"`
-	WindGust          float64 `json:"windGust"`
-	WindChill         float64 `json:"windChill"`
-	SolarRadiation    float64 `json:"solarRadiation"`
-	Uv                float64 `json:"uv"`
-	Uvi               float64 `json:"uvi"`
-	PrecipHourlyRate  float64 `json:"precipHourlyRate"`
-	PrecipDaily       float64 `json:"precipDaily"`
-	PrecipWeekly      float64 `json:"precipWeekly"`
-	PrecipMonthly     float64 `json:"precipMonthly"`
-	PrecipYearly      float64 `json:"precipYearly"`
-	HeatIndex         float64 `json:"heatIndex"`
+	ReceiverTime         string  `json:"receiverTime"`
+	ReceiverTimestamp    int64   `json:"receiverTimestamp"`
+	TemperatureIndoor    float64 `json:"temperatureIndoor"`
+	HumidityIndoor       float64 `json:"humidityIndoor"`
+	PressureAbsolute     float64 `json:"pressureAbsolute"`
+	PressureRelative     float64 `json:"pressureRelative"`
+	Temperature          float64 `json:"temperature"`
+	Humidity             float64 `json:"humidity"`
+	DewPoint             float64 `json:"dewPoint"`
+	WindDir              float64 `json:"windDir"`
+	WindDirCardinal      string  `json:"windDirCardinal"`
+	WindSpeed            float64 `json:"windSpeed"`
+	WindGust             float64 `json:"windGust"`
+	WindChill            float64 `json:"windChill"`
+	SolarRadiation       float64 `json:"solarRadiation"`
+	Uv                   float64 `json:"uv"`
+	Uvi                  float64 `json:"uvi"`
+	PrecipHourlyRate     float64 `json:"precipHourlyRate"`
+	PrecipDaily          float64 `json:"precipDaily"`
+	PrecipWeekly         float64 `json:"precipWeekly"`
+	PrecipMonthly        float64 `json:"precipMonthly"`
+	PrecipYearly         float64 `json:"precipYearly"`
+	HeatIndex            float64 `json:"heatIndex"`
+	IndoorSensorId       string  `json:"indoorSensorId"`
+	OutdoorSensorId      string  `json:"outdoorSensorId"`
+	IndoorSensorBattery  string  `json:"indoorSensorBattery"`
+	OutdoorSensorBattery string  `json:"outdoorSensorBattery"`
 }
 
 var pwsIp string
@@ -95,11 +99,18 @@ func parseHtml(doc *goquery.Document) WeatherData {
 
 		// parse the table rows and extract the data
 		rows.Each(func(i int, s *goquery.Selection) {
-			value := s.Find("input").AttrOr("value", "")
+			inputs := s.Find("input")
+			value := inputs.AttrOr("value", "")
 
 			switch i {
 			case 8:
 				weatherData.ReceiverTime = value
+			case 9:
+				weatherData.IndoorSensorId = value
+				weatherData.IndoorSensorBattery = inputs.Eq(1).AttrOr("value", "")
+			case 10:
+				weatherData.OutdoorSensorId = value
+				weatherData.OutdoorSensorBattery = inputs.Eq(1).AttrOr("value", "")
 			case 12:
 				weatherData.TemperatureIndoor = parseFloat(value)
 			case 13:
